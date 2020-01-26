@@ -13,12 +13,6 @@ def mmk():
 def rename(path):
     ''' Rename all jpg files in a given path '''
 
-    save_directory = 'mmk_pics_{}'
-    i = 1
-    while os.path.isdir(path+save_directory.format(i)):
-        i+=1
-    save_directory = save_directory.format(i)
-
     path_divisor = ''
     if '//' in path:
         path_divisor = '//'
@@ -30,7 +24,13 @@ def rename(path):
     length = len(path_divisor)
     if path[-length::] != path_divisor:
         path+=path_divisor
-    click.echo('Path: '+path)
+
+    save_directory = 'mmk_pics_{}'
+    i = 1
+    click.echo(path+save_directory.format(i))
+    while os.path.isdir(path+save_directory.format(i)):
+        i+=1
+    save_directory = save_directory.format(i)
 
     click.echo('Creating new directory: '+path+save_directory)
     os.mkdir(path+save_directory)
@@ -86,7 +86,7 @@ def make_movie(img_path, audio_path):
         f = filename.split('.')
         if f[-1] == 'jpg':
             img_total+=1
-    os.system('ffmpeg -f image2 -r 4/5 -i {} -vcodec libvpx -y {}'.format(img_path+'img_%01d.jpg', destiny+'mute.avi'))
+    os.system('ffmpeg -f image2 -r 4/5 -i {} -vcodec mjpeg -b 5000 -q:v 1 -y {}'.format(img_path+'img_%01d.jpg', destiny+'mute.avi'))
     click.echo('{} images was turned into one movie in [{}].'.format(img_total, destiny))
 
     try:
