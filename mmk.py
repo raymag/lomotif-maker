@@ -54,9 +54,10 @@ def rename(path):
 
 @mmk.command()
 @click.argument('img_path', type=click.Path(exists=True))
-def make_movie(img_path):
-    ''' Merges all organized jpg images into a avi video '''
-    
+@click.argument('audio_path', type=click.Path(exists=True))
+def make_movie(img_path, audio_path):
+    ''' Merges all organized jpg images into a avi video with a given soundtrack '''
+
     path_divisor = ''
     if '//' in img_path:
         path_divisor = '//'
@@ -68,7 +69,6 @@ def make_movie(img_path):
     length = len(path_divisor)
     if img_path[-length::] != path_divisor:
         img_path+=path_divisor
-    click.echo('Path: '+img_path)
 
     save_directory = 'mmk_movie_{}'
     i = 1
@@ -86,8 +86,15 @@ def make_movie(img_path):
         f = filename.split('.')
         if f[-1] == 'jpg':
             img_total+=1
-    os.system('ffmpeg -f image2 -r 4/5 -i {} -vcodec libvpx -y {}'.format(img_path+'img_%01d.jpg', destiny+'movie.avi'))
+    os.system('ffmpeg -f image2 -r 4/5 -i {} -vcodec libvpx -y {}'.format(img_path+'img_%01d.jpg', destiny+'mute.avi'))
     click.echo('{} images was turned into one movie in [{}].'.format(img_total, destiny))
+
+    try:
+        os.system('ffmpeg -i {} -i "{}" -codec copy -shortest {}'.format(destiny+'mute.avi', audio_path, destiny+'movie.avi'))
+        os.remove(destiny+'mute.avi')
+    except:
+        pass
+
     click.echo("Done.")
 
 if __name__ == '__main__':
